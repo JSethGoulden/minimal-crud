@@ -12,7 +12,7 @@ class ItemController extends Controller
      */
     public function index()
     {
-        return view('items.index', Item::paginate(10));
+        return view('items.index', ['items' => Item::paginate(10)]);
     }
 
     /**
@@ -28,7 +28,17 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string'
+        ]);
+
+        $item = Item::create([
+            'name' => $validated['name'],
+            'description' => $validated['description']
+        ]);
+
+        return redirect()->route('items.show', $item);
     }
 
     /**
@@ -36,7 +46,7 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        return view ('items.show', $item);
+        return view ('items.show', ['item' => $item]);
     }
 
     /**
@@ -44,15 +54,25 @@ class ItemController extends Controller
      */
     public function edit(Item $item)
     {
-        return view('items.edit', $item);
+        return view('items.edit', ['item' => $item]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Item $item)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'string|required',
+            'description' => 'string|required'
+        ]);
+
+        $item->name = $validated['name'];
+        $item->description = $validated['description'];
+
+        $item->save();
+
+        return redirect()->route('items.show', $item);
     }
 
     /**
